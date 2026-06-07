@@ -14,28 +14,26 @@ return new class extends Migration
         Schema::create('citoyen', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('nom',100);
-            $table->string('prenom',100)->nullable();
             $table->date('date_naissance');
-            $table->enum('sexe',['M','F']);
-            $table->string('telephone',20)->unique();
-            $table->string('email',191)->nullable()->unique();
-            $table->string('password');
-            $table->enum('groupe_sanguin',['O','A','B','AB']);
-            $table->enum('rhesus',['+','-']);
+            $table->enum('sexe', ['M', 'F']);
+            $table->enum('groupe_sanguin', ['O', 'A', 'B', 'AB']);
+            $table->enum('rhesus', ['+', '-']);
             $table->boolean('disponible')->default(false);
-            $table->decimal('localisation_lat',10,8)->nullable();
-            $table->decimal('localisation_lng',11,8)->nullable();
+            $table->decimal('localisation_lat', 10, 8)->nullable();
+            $table->decimal('localisation_lng', 11, 8)->nullable();
             $table->boolean('a_tatouage_recent')->default(false);
             $table->boolean('douleurs_thoraciques')->default(false);
             $table->boolean('consomme_alcool')->default(false);
             $table->date('date_dernieres_regles')->nullable();
             $table->string('fcm_token')->nullable();
+            $table->foreignId('user_id')
+                ->unique()
+                ->constrained('users')
+                ->onDelete('cascade');
             $table->index('groupe_sanguin');
             $table->index('rhesus');
             $table->index('disponible');
-            $table->index(['localisation_lat','localisation_lng']);
-            
+            $table->index(['localisation_lat', 'localisation_lng']);
         });
     }
 

@@ -14,19 +14,20 @@ return new class extends Migration
         Schema::create('banque_sang', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->string('nom',150);
-            $table->string('ville',100)->nullable();
-            $table->string('quartier',100)->nullable();
-            $table->decimal('latitude',10,8)->nullable();
-            $table->decimal('longitude',11,8)->nullable();
-            $table->string('telephone',20);
-            $table->string('email',191)->nullable()->unique();
-            $table->string('password');
-            $table->enum('type_banque',['reconnue','district']);
-            $table->enum('statut',['en_attente','active','suspendue'])->default('en_attente');
+            $table->string('nom', 150);
+            $table->string('ville', 100)->nullable();
+            $table->string('quartier', 100)->nullable();
+            $table->decimal('latitude', 10, 8)->nullable();
+            $table->decimal('longitude', 11, 8)->nullable();
+            $table->enum('type_banque', ['reconnue', 'district']);
+            $table->enum('statut', ['en_attente', 'active', 'suspendue'])->default('en_attente');
             $table->string('fcm_token')->nullable();
+            $table->foreignId('user_id')
+                ->unique()
+                ->constrained('users')
+                ->onDelete('cascade');
             $table->index('statut');
-            $table->index(['latitude','longitude']);
+            $table->index(['latitude', 'longitude']);
         });
     }
 
