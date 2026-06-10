@@ -26,6 +26,7 @@ return new class extends Migration
             $table->index('id_banque');
             $table->index('id_citoyen');
             $table->index('date_don');
+            $table->softDeletes();
        
         });
     }

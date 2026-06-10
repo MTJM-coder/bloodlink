@@ -26,6 +26,7 @@ return new class extends Migration
             $table->index('type_alerte');
             $table->index('statut');
             $table->index(['groupe_sanguin','rhesus']);
+            $table->softDeletes();
         });
     }
 

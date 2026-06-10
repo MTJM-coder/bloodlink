@@ -21,13 +21,16 @@ return new class extends Migration
                 'transfusion',
                 'transfert',
                 'expiration',
-                'destruction'
+                'destruction',
+                'archivage'
             ]);
             $table->text('commentaire')->nullable();
+            $table->string('raison_archivage',255)->nullable();
             $table->date('date_mouvement');
             $table->integer('quantite')->default(1);
             $table->foreign('id_poche')->references('id')->on('poche_sang')->onDelete('cascade');
             $table->index('type_mouvement');
+            $table->softDeletes();
         });
     }
 

@@ -27,6 +27,7 @@ return new class extends Migration
             $table->foreign('id_banque')->references('id')->on('banque_sang')->onDelete('cascade');
             $table->index(['id_banque','statut']);
             $table->index('statut');
+            $table->softDeletes();
             // $table->index('date_enregistement');
         });
     }

@@ -23,11 +23,29 @@ class User extends Authenticatable
      *
      * @return array<string, string>
      */
+    
+
+
     protected function casts(): array
     {
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function banqueSang()
+    {
+        return $this->hasOne(BanqueSang::class, 'user_id');
+    }
+
+    public function isAdmin()
+    {
+        return $this->role === 'admin';
+    }
+
+    public function citoyen()
+    {
+        return $this->hasOne(Citoyen::class, 'user_id');
     }
 }

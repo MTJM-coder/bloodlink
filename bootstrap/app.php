@@ -14,6 +14,8 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         //
+       $middleware->alias(['admin' => App\Http\Middleware\adminMiddleware::class]);
+       $middleware->alias(['banque' => App\Http\Middleware\banqueMiddleware::class]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

@@ -6,6 +6,10 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Database\Eloquent\Model;
+use App\Models\BanqueSang;
+
 
 class authController extends Controller
 {
@@ -18,23 +22,6 @@ class authController extends Controller
             'password' => 'required|string|min:8',
         ]);
 
-    //     DB::beginTransaction();
-    //     try{
-    //         $user=new User();
-    //         $user->nom=$validatedData['nom'];
-    //         $user->email=$validatedData['email'];
-    //         $user->role=$validatedData['role'];
-    //         $user->password=Hash::make($validatedData['password']);
-    //         $user->telephone=$validatedData['telephone'];
-    //         $user->save();
-    //         if($validatedData['role']=='citoyen'){
-    //             $citoyen=new Citoyen();
-    //             $citoyen->user_id=$user->id;
-    //             $citoyen->save();
-    //         }elseif($validatedData['role']=='banque'){
-    //     }
-
-    // }
 
     $user= User::where('email', $validatedData['email_or_phone'])
     ->orWhere('telephone', $validatedData['email_or_phone'])
@@ -52,5 +39,29 @@ class authController extends Controller
         return response()->json(['message' => 'Connexion réussie', 'user' => $user, 'token' => $token], 200);
     }
     
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+        return response()->json(['message' => 'Déconnexion réussie'], 200);
+    }
+
+    public function profile()
+    {
+        /** @var \App\Models\User|null $user */
+        $user = Auth::user();
+        if (!$user) {
+            return response()->json(['message' => 'Utilisateur non authentifié'], 401);
+        }
+
+        if ($user->role === 'banque') {
+            $user->load('banqueSang');
+        }
+        else if ($user->role === 'citoyen') {
+            $user->load('citoyen');
+        }
+
+        return response()->json(['user' => $user], 200);
     }
 }

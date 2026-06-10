@@ -31,6 +31,7 @@ return new class extends Migration
             $table->index('statut');
             $table->index('date_expiration');
             $table->index(['id_banque','statut']);
+            $table->softDeletes();
         });
     }
 

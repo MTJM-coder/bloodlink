@@ -23,6 +23,7 @@ return new class extends Migration
             $table->foreign('id_alerte')->references('id')->on('alerte')->onDelete('cascade');
             $table->unique(['id_alerte','id_citoyen']);
             $table->index('statut');
+            $table->softDeletes();
         });
     }
 
