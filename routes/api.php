@@ -5,12 +5,15 @@ use App\Http\Controllers\citoyenController;
 use App\Http\Controllers\banqueController;
 use App\Http\Controllers\stockController;
 use App\Http\Controllers\pocheController;
+use App\Http\Controllers\searchController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/auth/login', [authController::class, 'login'])->name('login');
 Route::post('/auth/citizen/register', [citoyenController::class, 'register']);
 Route::post('/auth/bank/register', [banqueController::class, 'register']);
+
+Route::get('/blood/search',[searchController::class,'searchBlood'])->name('blood.search');
 
 
 Route::middleware('auth:sanctum')->group(function () {
