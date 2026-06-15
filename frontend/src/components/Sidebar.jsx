@@ -2,16 +2,18 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import {
   FiGrid, FiDroplet, FiBell, FiDollarSign,
   FiHome, FiSettings, FiLogOut,
+  FiBookOpen,
 } from 'react-icons/fi';
 import api from '../api/axios';
 
 const menuItems = [
-  { label: 'Tableau de bord', path: '/dashboard', icon: <FiGrid /> },
-  { label: 'Stock', path: '/dashboard/stock', icon: <FiDroplet /> },
-  { label: 'Alertes', path: '/dashboard/alertes', icon: <FiBell /> },
-  { label: 'Cautions', path: '/dashboard/cautions', icon: <FiDollarSign /> },
-  { label: 'Partenaires', path: '/dashboard/partenaires', icon: <FiHome /> },
-  { label: 'Profil', path: '/dashboard/profil', icon: <FiSettings /> },
+  { label: 'Tableau de bord', path: '/bank/dashboard', icon: <FiGrid /> },
+  { label: 'Stock', path: '/bank/dashboard/stock', icon: <FiDroplet /> },
+  {label: 'historique',path:'bank/dashboard/historique',icon:<FiBookOpen/>},
+  { label: 'Alertes', path: '/bank/dashboard/alertes', icon: <FiBell /> },
+  { label: 'Cautions', path: '/bank/dashboard/cautions', icon: <FiDollarSign /> },
+  { label: 'Partenaires', path: '/bank/dashboard/partenaires', icon: <FiHome /> },
+  { label: 'Profil', path: '/bank/dashboard/profil', icon: <FiSettings /> },
 ];
 
 export default function Sidebar({ onNavigate }) {

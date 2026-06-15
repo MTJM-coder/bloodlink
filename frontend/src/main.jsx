@@ -7,6 +7,7 @@ import Login from './pages/login.jsx'
 import Home from './pages/Home.jsx';
 import DashboardBank from './pages/DashboardBank.jsx';
 import DashboardLayout from './components/DashboardLayout.jsx';
+import Stock from './pages/Stock.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')).render(
       <Route path="/bank/dashboard" element={<DashboardLayout/>}>
 
         <Route index element={<DashboardBank/>}/>
+         <Route path="stock" element={<Stock />} />
       </Route>
 
     </Routes>
