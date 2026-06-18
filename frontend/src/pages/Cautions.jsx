@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { FiPlus, FiClock, FiCheckCircle, FiDollarSign, FiUsers,FiRefreshCw } from 'react-icons/fi';
+import { FiPlus, FiClock, FiCheckCircle, FiDollarSign, FiUsers, FiRefreshCw } from 'react-icons/fi';
 import api from '../api/axios';
 import CreateCautionModal from '../components/cautions/CreateCautionModal';
 import RembourserModal from '../components/cautions/RembourserModal';
+import FactureModal from '../components/cautions/FactureModal';
 
 const STATUT_BADGE = {
   en_attente: 'bg-amber-50 text-amber-700',
@@ -22,6 +23,7 @@ export default function Cautions() {
   const [error, setError] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [rembourserCaution, setRembourserCaution] = useState(null);
+  const [factureId, setFactureId] = useState(null);
 
   const charger = () => {
     setLoading(true);
@@ -46,6 +48,25 @@ export default function Cautions() {
   const donneursAttente = cautions
     .filter((c) => c.statut !== 'remboursee')
     .reduce((sum, c) => sum + Math.max(0, (c.nb_donneurs_attendus || 0) - (c.nb_donneurs_ramenes || 0)), 0);
+
+  // const handleVoirFacture = async (id) => {
+  //   try {
+  //     const response = await api.get(`/bank/cautions/${id}/facture`, {
+  //       responseType: 'blob',
+  //     });
+
+  //     const url = window.URL.createObjectURL(
+  //       new Blob([response.data], { type: 'application/pdf' })
+  //     );
+
+  //     window.open(url, '_blank');
+  //     setTimeout(() => window.URL.revokeObjectURL(url), 60000);
+  //   } catch (err) {
+  //     console.error('Erreur facture:', err.response?.status, err.response?.data, err.message);
+  //     alert('Impossible de générer la facture');
+  //   }
+  // };
+
 
   return (
     <>
@@ -72,7 +93,7 @@ export default function Cautions() {
         <StatCard icon={<FiCheckCircle size={18} />} iconBg="bg-green-50 text-green-600" label="Remboursées" value={nbRemboursees} />
         <StatCard icon={<FiDollarSign size={18} />} iconBg="bg-blue-50 text-blue-600" label="Montant total retenu" value={`${montantTotal.toLocaleString('fr-FR')} FCFA`} />
         <StatCard icon={<FiUsers size={18} />} iconBg="bg-red-50 text-red-600" label="Donneurs en attente" value={donneursAttente} />
-        <StatCard icon={<FiRefreshCw size={18} />} iconBg="bg-blue-50 text-blue-600" label="Partiellement remboursées" value={nbPartielles}/>
+        <StatCard icon={<FiRefreshCw size={18} />} iconBg="bg-blue-50 text-blue-600" label="Partiellement remboursées" value={nbPartielles} />
       </div>
 
       {/* ONGLETS */}
@@ -126,7 +147,7 @@ export default function Cautions() {
                   const peutRembourser = c.statut !== 'remboursee';
 
                   return (
-                    <tr key={c.id_caution} className="border-t border-slate-100">
+                    <tr key={c.id} className="border-t border-slate-100">
                       <td className="px-4 py-3 font-medium text-slate-800">{c.representant_nom}</td>
                       <td className="px-4 py-3 text-slate-500">{c.representant_telephone}</td>
                       <td className="px-4 py-3 font-medium text-slate-800">
@@ -154,7 +175,10 @@ export default function Cautions() {
                         </span>
                       </td>
                       <td className="px-4 py-3 text-right whitespace-nowrap">
-                        <button className="text-xs text-blue-600 mr-3">
+                        <button
+                          onClick={() => setFactureId(c.id)}
+                          className="text-xs text-blue-600 mr-3"
+                        >
                           Voir facture
                         </button>
                         {onglet === 'ACTIVES' && (
@@ -193,8 +217,16 @@ export default function Cautions() {
           onSuccess={() => { setRembourserCaution(null); charger(); }}
         />
       )}
+
+        {
+    factureId && (
+      <FactureModal cautionId={factureId} onClose={() => setFactureId(null)} />
+    )
+  }
     </>
   );
+
+
 }
 
 function StatCard({ icon, iconBg, label, value }) {

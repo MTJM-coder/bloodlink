@@ -10,6 +10,10 @@ import DashboardLayout from './components/DashboardLayout.jsx';
 import Alertes from './pages/Alertes.jsx';
 import Stock from './pages/Stock.jsx';
 import Cautions from './pages/Cautions.jsx';
+import Partenaires from './pages/Partenaires.jsx';
+import Donneurs from './pages/Donneurs.jsx';
+import Profil from './pages/Profil.jsx';
+
 
 
 createRoot(document.getElementById('root')).render(
@@ -17,12 +21,15 @@ createRoot(document.getElementById('root')).render(
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/bank/dashboard" element={<DashboardLayout/>}>
+      <Route path="/bank/dashboard" element={<DashboardLayout />}>
 
-        <Route index element={<DashboardBank/>}/>
-         <Route path="stock" element={<Stock />} />
-         <Route path="alertes" element={<Alertes />} />
-           <Route path="cautions" element={<Cautions />} />
+        <Route index element={<DashboardBank />} />
+        <Route path="stock" element={<Stock />} />
+        <Route path="alertes" element={<Alertes />} />
+        <Route path="cautions" element={<Cautions />} />
+        <Route path="partenaires" element={<Partenaires />} />
+        <Route path="donneurs" element={<Donneurs />} />
+        <Route path="profil" element={<Profil />} />
       </Route>
 
     </Routes>

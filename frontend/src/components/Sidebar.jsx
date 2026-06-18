@@ -3,6 +3,7 @@ import {
   FiGrid, FiDroplet, FiBell, FiDollarSign,
   FiHome, FiSettings, FiLogOut,
   FiBookOpen,
+  FiUser,
 } from 'react-icons/fi';
 import api from '../api/axios';
 
@@ -13,6 +14,7 @@ const menuItems = [
   { label: 'Alertes', path: '/bank/dashboard/alertes', icon: <FiBell /> },
   { label: 'Cautions', path: '/bank/dashboard/cautions', icon: <FiDollarSign /> },
   { label: 'Partenaires', path: '/bank/dashboard/partenaires', icon: <FiHome /> },
+  {label:'Donneurs', path:'/bank/dashboard/donneurs',icon:<FiUser/>},
   { label: 'Profil', path: '/bank/dashboard/profil', icon: <FiSettings /> },
 ];
 
