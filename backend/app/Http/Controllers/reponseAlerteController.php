@@ -92,7 +92,8 @@ class reponseAlerteController extends Controller
         }
 
         // Générer QR code unique
-        $qrCode = $this->genererQRCode($citoyen->id_citoyen, $alerte->id_alerte);
+        // $qrCode = $this->genererQRCode($citoyen->id_citoyen, $alerte->id_alerte);
+        $qrCode = 'YAB-'.date('Y') . '-' . str_pad($alerte->id, 4, '0', STR_PAD_LEFT) . '-' . str_pad($citoyen->id, 4, '0', STR_PAD_LEFT);
 
         // Créer la réponse
         $reponse = new ReponseAlerte();
@@ -116,7 +117,7 @@ class reponseAlerteController extends Controller
             'message' => 'Réponse enregistrée',
             'reponse' => [
                 'id_reponse' => $reponse->id,
-                'qr_code' => $qrCode,
+                'numeroReponse' => $qrCode,
                 'banque' => $alerte->banque->nom,
                 'adresse' => $alerte->banque->adresse,
                 'telephone' => $alerte->banque->telephone,

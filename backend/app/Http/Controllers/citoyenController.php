@@ -7,6 +7,7 @@ use App\Models\Citoyen;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class citoyenController extends Controller
 {
@@ -53,4 +54,21 @@ class citoyenController extends Controller
             return response()->json(['message' => 'Erreur lors de l\'inscription', 'error' => $e->getMessage()], 500);
         }
     }
+    public function saveFCMToken(Request $request)
+{
+    $user = Auth::user();
+    $citoyen = $user->citoyen;
+
+    if (!$citoyen) {
+        return response()->json(['success' => false], 404);
+    }
+
+    $validated = $request->validate([
+        'fcm_token' => 'required|string',
+    ]);
+
+    $citoyen->update(['fcm_token' => $validated['fcm_token']]);
+
+    return response()->json(['success' => true], 200);
+}
 }

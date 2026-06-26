@@ -28,6 +28,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/alertes/actives', [ReponseAlerteController::class, 'alertesActives']);
     Route::post('/alertes/{id}/repondre', [ReponseAlerteController::class, 'repondre']);
 
+    Route::post('/citoyen/fcm-token', [CitoyenController::class, 'saveFCMToken']);
+
     // Routes protégées pour les banques de sang
     Route::middleware('banque')->group(function () {
         Route::get('/bank/stock', [stockController::class, 'getMyStock'])->name('bank.stock');
@@ -58,5 +60,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/bank/profil', [BanqueController::class, 'profil']);
         Route::put('/bank/profil', [BanqueController::class, 'updateProfil']);
         Route::put('/bank/profil/password', [BanqueController::class, 'updatePassword']);
+        
     });
 });

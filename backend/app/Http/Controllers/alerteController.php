@@ -14,8 +14,8 @@ class alerteController extends Controller
     public function createAlert(Request $request)
     {
 
-    $user = Auth::user();
-    $banqueSang = $user->banqueSang;
+        $user = Auth::user();
+        $banqueSang = $user->banqueSang;
         $validated = $request->validate([
             'groupe_sanguin' => 'required|in:O,A,B,AB',
             'rhesus' => 'required|in:+,-',
@@ -23,11 +23,11 @@ class alerteController extends Controller
             // 'type_produit' => 'required|in:CGR,plasma,plaquettes',
             'type_don_accepte' => 'nullable|string|max:50',
             'message' => 'nullable|string|max:255',
-            'rayon'=>'nullable|integer|min:1'
+            'rayon' => 'nullable|integer|min:1'
         ]);
-        
-         // Logique de création d'alerte
-         
+
+        // Logique de création d'alerte
+
 
         $alerte = new Alerte();
         $alerte->id_banque = $banqueSang->id;
@@ -39,15 +39,15 @@ class alerteController extends Controller
         $alerte->save();
 
         // trouver des citoyens compatibles
-        $citoyensCompatibles = $this->trouverCitoyensCompatibles($banqueSang,$validated['groupe_sanguin'], $validated['rhesus'],$validated['rayon']);
-        
+        $citoyensCompatibles = $this->trouverCitoyensCompatibles($banqueSang, $validated['groupe_sanguin'], $validated['rhesus'], $validated['rayon']);
+
         // Envoyer des notifications aux citoyens compatibles
 
         $notificationsEnvoyees = $this->envoyerNotifications($citoyensCompatibles, $alerte);
 
 
-       
-       
+
+
 
         return response()->json([
             'success' => true,
@@ -59,19 +59,20 @@ class alerteController extends Controller
                 'message' => $alerte->message,
                 'nb_citoyens_notifies' => count($citoyensCompatibles),
             ]
-        ],201);
+        ], 201);
     }
 
-    private function trouverCitoyensCompatibles($banqueSang,$groupeSanguin,$rhesus,$rayon){
-        $citoyens = Citoyen::where('groupe_sanguin',$groupeSanguin)
-                            ->where('rhesus',$rhesus)
-                            ->where('disponible',true)
-                            ->get();
+    private function trouverCitoyensCompatibles($banqueSang, $groupeSanguin, $rhesus, $rayon)
+    {
+        $citoyens = Citoyen::where('groupe_sanguin', $groupeSanguin)
+            ->where('rhesus', $rhesus)
+            ->where('disponible', true)
+            ->get();
         $citoyensProches = [];
-        foreach ($citoyens as $citoyen){
-            if($citoyen->localisation_lat && $citoyen->localisation_lng){
-                $distance=$this->calculerDistance($banqueSang->latitude,$banqueSang->longitude,$citoyen->localisation_lat,$citoyen->localisation_lng);
-                if($distance <= $rayon){
+        foreach ($citoyens as $citoyen) {
+            if ($citoyen->localisation_lat && $citoyen->localisation_lng) {
+                $distance = $this->calculerDistance($banqueSang->latitude, $banqueSang->longitude, $citoyen->localisation_lat, $citoyen->localisation_lng);
+                if ($distance <= $rayon) {
                     $citoyensProches[] = $citoyen;
                 }
             }
@@ -80,7 +81,8 @@ class alerteController extends Controller
         return $citoyensProches;
     }
 
-    private function calculerDistance($lat1,$lng1,$lat2,$lng2){
+    private function calculerDistance($lat1, $lng1, $lat2, $lng2)
+    {
         $earthRadius = 6371;
         $dLat = deg2rad($lat2 - $lat1);
         $dLng = deg2rad($lng2 - $lng1);
@@ -88,51 +90,73 @@ class alerteController extends Controller
         $c = 2 * atan2(sqrt($a), sqrt(1 - $a));
         return $earthRadius * $c;
     }
-
-    private function envoyerNotifications($citoyens,$alerte){
-        foreach ($citoyens as $citoyen){
-             Log::info('Notification Firebase', [
-            'citoyen_id' => $citoyen->id,
-            'alerte_id' => $alerte->id_alerte,
-            'groupe' => $alerte->groupe_sanguin . $alerte->rhesus,
-        ]);
+    private function envoyerNotifications($citoyen, $alerte)
+    {
+        if (!$citoyen->fcm_token) {
+            return;
         }
 
-       
+        try {
+            $url = 'https://exp.host/--/api/v2/push/send';
+
+            $data = [
+                'to' => $citoyen->fcm_token,
+                'title' => "Alerte BloodLink — {$alerte->groupe_sanguin}{$alerte->rhesus}",
+                'body' => "Une banque près de vous a besoin de sang {$alerte->groupe_sanguin}{$alerte->rhesus}",
+                'sound' => 'default',
+                'data' => [
+                    'alerte_id' => (string) $alerte->id_alerte,
+                    'groupe' => $alerte->groupe_sanguin . $alerte->rhesus,
+                    'type' => $alerte->type_alerte,
+                ],
+            ];
+
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_POST, true);
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json', 'Accept: application/json']);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+            $result = curl_exec($ch);
+            curl_close($ch);
+
+            Log::info('Notification envoyée via Expo', ['result' => $result]);
+        } catch (\Exception $e) {
+            Log::error('Erreur Expo Push: ' . $e->getMessage());
+        }
     }
 
 
-    public function getAlerts(){
+    public function getAlerts()
+    {
         $user = Auth::user();
         $banqueSang = $user->banqueSang;
-    
-        $alerts = Alerte::with('reponsesAlertes')->where('id_banque',$banqueSang->id)
-                ->orderBy('created_at')
-                ->get();
+
+        $alerts = Alerte::with('reponsesAlertes')->where('id_banque', $banqueSang->id)
+            ->orderBy('created_at')
+            ->get();
         return response()->json([
-            'success'=>true,
-            'alertes'=>$alerts
-        ],200);  
+            'success' => true,
+            'alertes' => $alerts
+        ], 200);
     }
 
-    public function close ($id){
+    public function close($id)
+    {
         $user = Auth::user();
         $banqueSang = $user->banqueSang;
-        $alerte =Alerte::where('id',$id)
-                        ->where('id_banque',$banqueSang->id)
-                        ->first();
-        if(!$alerte){
-            return response()->json(['success'=>false,'message'=>"alerte non trouvée"],404);
+        $alerte = Alerte::where('id', $id)
+            ->where('id_banque', $banqueSang->id)
+            ->first();
+        if (!$alerte) {
+            return response()->json(['success' => false, 'message' => "alerte non trouvée"], 404);
         }
-         $alerte->statut = 'cloture';
-         $alerte->save();
+        $alerte->statut = 'cloture';
+        $alerte->save();
 
-         return response()->json([
+        return response()->json([
             'success' => true,
             'message' => 'Alerte cloturée'
-         ],200);
+        ], 200);
     }
-
-   
-
 }
